@@ -59,6 +59,9 @@ export const FORMAT_SUMMARY: FormatSummary[] = [
   { name: 'Franchise', ranks: 'Emerald – M/GM 800 LP', format: 'GMs draft and manage a team of 5', nights: 'Wednesdays · 8:30 PM ET', fee: '$15 / player', pool: '$1,200', season: 'Oct 7 – Dec 16' },
 ];
 
+/** URL slug for a format, used as ?league=<slug> on the leagues page. */
+export const leagueSlug = (f: { name: string }) => f.name.toLowerCase();
+
 // Leagues page. range = [lowest tier index, highest tier index] into TIERS.
 export const FORMATS: Format[] = [
   {

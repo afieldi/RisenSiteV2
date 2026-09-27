@@ -2,7 +2,7 @@ import { useRef, useState, type MouseEvent, type PointerEvent } from 'react';
 import { Layout } from '../components/Layout';
 import { Logo3D } from '../components/Logo3D';
 import { Reveal } from '../components/Reveal';
-import { DISCORD_URL, FORMAT_SUMMARY } from '../data';
+import { DISCORD_URL, FORMATS, FORMAT_SUMMARY, leagueSlug } from '../data';
 import { useDriftScroll, useHeroScroll } from '../hooks/useScrollVar';
 import { cx, pad } from '../lib/util';
 import logoUrl from '../assets/risen-logo.png';
@@ -35,7 +35,7 @@ function FormatList() {
           as="a"
           key={f.name}
           className={cx('fill-row', i === open && 'is-open')}
-          href={`./leagues.html?league=${i}`}
+          href={`./leagues?league=${leagueSlug(FORMATS[i])}`}
           onPointerDown={(e: PointerEvent) => { pointer.current = e.pointerType; }}
           onPointerEnter={(e: PointerEvent) => { if (e.pointerType === 'mouse') setOpen(i); }}
           onClick={(e: MouseEvent) => onClick(e, i)}
@@ -79,7 +79,7 @@ export function HomePage() {
             </h1>
             <p className="lede anim-fade" style={{ '--d': '1.1s' }}>Four league formats, weekly matches and a community that plays together. Compete solo or with a full team.</p>
             <div className="btn-row anim-fade" style={{ '--d': '1.2s' }}>
-              <a className="btn btn--primary" href="./leagues.html">See the leagues</a>
+              <a className="btn btn--primary" href="./leagues">See the leagues</a>
               <a className="btn btn--ghost" href={DISCORD_URL}>Join Discord</a>
             </div>
           </div>
@@ -131,7 +131,7 @@ export function HomePage() {
           <Reveal as="p" className="lede" delay={100}>Find a team, meet the staff and get every announcement first in the Risen Discord.</Reveal>
           <Reveal className="btn-row" delay={160}>
             <a className="btn btn--primary btn--lg" href={DISCORD_URL}>Join the Risen Discord</a>
-            <a className="btn btn--ghost btn--lg" href="./contact.html">Who to contact</a>
+            <a className="btn btn--ghost btn--lg" href="./contact">Who to contact</a>
           </Reveal>
         </section>
       </main>

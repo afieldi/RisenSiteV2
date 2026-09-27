@@ -6,9 +6,9 @@ import logoUrl from '../assets/risen-logo.png';
 export type Page = 'home' | 'leagues' | 'contact';
 
 export const PAGES: { page: Page; label: string; href: string }[] = [
-  { page: 'home', label: 'Home', href: './index.html' },
-  { page: 'leagues', label: 'Leagues', href: './leagues.html' },
-  { page: 'contact', label: 'Contact', href: './contact.html' },
+  { page: 'home', label: 'Home', href: './' },
+  { page: 'leagues', label: 'Leagues', href: './leagues' },
+  { page: 'contact', label: 'Contact', href: './contact' },
 ];
 
 // Mobile nav sheet: hamburger toggles .is-open; scrim, links, Escape and widening past the breakpoint close it.
@@ -38,7 +38,7 @@ export function Nav({ active }: { active: Page }) {
 
   return (
     <nav className={cx('nav', open && 'is-open')}>
-      <a className="nav__logo" href="./index.html"><img src={logoUrl} alt="Risen eSports" /></a>
+      <a className="nav__logo" href="./"><img src={logoUrl} alt="Risen eSports" /></a>
       <button
         ref={toggleRef}
         className="nav__toggle"

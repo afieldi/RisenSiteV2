@@ -2,12 +2,12 @@ import { useRef, useState, type CSSProperties } from 'react';
 import { Layout } from '../components/Layout';
 import { PageHero } from '../components/PageHero';
 import { Reveal } from '../components/Reveal';
-import { DISCORD_URL, FORMATS, STATS_URL, TIERS, type CompareRow, type Format } from '../data';
+import { DISCORD_URL, FORMATS, STATS_URL, TIERS, leagueSlug, type CompareRow, type Format } from '../data';
 import { cx, pad } from '../lib/util';
 
 function initialSelection() {
-  const q = Number(new URLSearchParams(location.search).get('league'));
-  return q > 0 && q < FORMATS.length ? q : 0;
+  const q = new URLSearchParams(location.search).get('league');
+  return Math.max(0, FORMATS.findIndex(f => leagueSlug(f) === q));
 }
 
 function compareRows(f: Format): CompareRow[] {
@@ -132,7 +132,7 @@ export function LeaguesPage() {
     // The detail's top doesn't move when its content changes, so it can be measured before re-render.
     const y = detailRef.current!.getBoundingClientRect().top + scrollY - 90;
     if (forceScroll || scrollY > y) scrollTo({ top: y, behavior: 'smooth' });
-    history.replaceState(null, '', `?league=${i}`);
+    history.replaceState(null, '', `?league=${leagueSlug(FORMATS[i])}`);
   };
 
   return (
@@ -182,7 +182,7 @@ export function LeaguesPage() {
         <Reveal as="p" className="lede" delay={80}>Registration for every league runs through the Risen Discord.</Reveal>
         <Reveal className="btn-row" delay={140}>
           <a className="btn btn--primary btn--lg" href={DISCORD_URL}>Join the Risen Discord</a>
-          <a className="btn btn--ghost btn--lg" href="./contact.html">Who to contact</a>
+          <a className="btn btn--ghost btn--lg" href="./contact">Who to contact</a>
         </Reveal>
       </section>
     </Layout>
