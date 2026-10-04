@@ -6,9 +6,12 @@ import { DISCORD_URL } from '../data';
 import { cx } from '../lib/util';
 
 const TOPICS = [
-  { name: 'League questions', desc: 'Schedules, rules and results for a specific league.', handle: '@Community Operations', role: "Your league's staff" },
+  { name: 'Quick questions', desc: 'Simple, non-sensitive questions. The community answers fastest.', handle: '#help', role: 'Risen Discord' },
+  { name: 'Private matters', desc: 'Anything sensitive or needing a back-and-forth with staff.', handle: '#open-a-ticket', role: 'Server admins' },
+  { name: 'Draft & Teambuilder', desc: 'Schedules, rules and rosters for community leagues.', handle: '@Draconic · @Wantmarriage', role: 'Community Operations' },
   { name: 'Premade leagues', desc: 'Rosters, registration and operations for premade leagues.', handle: '@Dobby | Premade', role: 'Premade Operations' },
   { name: 'Mythical', desc: 'Anything specific to the Mythical league.', handle: '@Chappy - Mythical', role: 'Mythical Operations' },
+  { name: 'Casting & production', desc: 'Joining the broadcast team as a caster or producer.', handle: '@Mayo - Stream Badmin', role: 'Stream Management' },
   { name: 'Moderation & community', desc: 'Reports, conduct and community issues.', handle: '@The Slaw', role: 'Head of Moderation' },
   { name: 'Website & stats', desc: 'Risen Stats, the website and the API.', handle: '@Earleking', role: 'Website & API Wizard' },
   { name: 'Partnerships & the org', desc: 'Sponsorships, partnerships and anything about Risen itself.', handle: '@The Balgrog of Pouria', role: 'Co-Owner & Founder' },
@@ -32,8 +35,24 @@ const STAFF = [
   {
     group: 'Community Admin',
     people: [
-      { name: '@Each League Has', role: 'Community Operations' },
+      { name: '@Draconic', role: 'Community Operations' },
+      { name: '@Wantmarriage', role: 'Community Operations' },
+    ],
+  },
+  {
+    group: 'Technical Admin',
+    people: [
       { name: '@Earleking', role: 'Website & API Wizard' },
+      { name: '@Ubys', role: 'Sheets Mastermind' },
+    ],
+  },
+  {
+    group: 'Stream Admin',
+    people: [
+      { name: '@Matt | Stream', role: 'Production Director' },
+      { name: '@Kaddie | Stream', role: 'Stream Management' },
+      { name: '@FridayAgain', role: 'Stream Management' },
+      { name: '@Mayo - Stream Badmin', role: 'Stream Management' },
     ],
   },
 ];
@@ -101,8 +120,8 @@ export function ContactPage() {
           </div>
           <div className="discord-band__aside">
             <span className="mono" style={{ fontSize: 11, color: 'var(--dim)' }}>Before you message staff</span>
-            <p>Check the announcements and rules channels first. Most schedule, format and eligibility questions are answered there.</p>
-            <p>For anything league-specific, contact that league's Community Operations staff before escalating.</p>
+            <p>Check #risen-info and #announcements first. Most schedule, format and eligibility questions are answered there.</p>
+            <p>Ask simple questions in #help. Only open a ticket for sensitive matters or anything that needs a private conversation with staff.</p>
           </div>
         </section>
       </main>
