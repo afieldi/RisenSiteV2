@@ -38,6 +38,17 @@ Add a file `public/CNAME` containing your domain (e.g. `www.risenesports.com`), 
 | Colors, fonts, spacing | CSS variables at the top of `src/styles.css` |
 | 3D logo rotation limits | `MAX_YAW` / `MAX_PITCH` in `src/lib/logo3d.ts` |
 
+### Syncing league info from Discord
+
+League info lives in the Risen Discord, mostly in the `#risen-info` embeds. To dump a channel's recent messages (embeds included) as JSON:
+
+```bash
+scripts/fetch-discord.sh 945547601514745936      # #risen-info
+scripts/fetch-discord.sh 291315891214352384 20   # last 20 #announcements
+```
+
+Needs `curl`, `jq` and a bot token in `.env` as `RISEN_BOT_TOKEN=` (or `DISCORD_TOKEN=`). `.env` is gitignored.
+
 Fees, prize pools, season dates and the Discord link are **placeholders** — update them before launch.
 
 ## Structure
