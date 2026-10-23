@@ -19,7 +19,7 @@ const LAYERS: { k: LayerKey; z: number; d: number; e: number }[] = [
   { k: 'white', z: 0.19, d: 0.13, e: 0.12 },
 ];
 const SLICES = 5;
-const COPIES = 9;
+const COPIES = 72;  // side slices per layer; dense enough that gaps are sub-pixel
 const MAX_YAW = 0.28;   // radians of cursor-driven rotation
 const MAX_PITCH = 0.18;
 const ease = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 4);
@@ -27,7 +27,7 @@ const ease = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 4);
 const LAYER_KEYS: LayerKey[] = ['navy', 'red', 'orange', 'white'];
 
 function colorMasks(img: HTMLImageElement): Record<LayerKey, HTMLCanvasElement> {
-  const S = 1024;
+  const S = 2048;
   const cv = document.createElement('canvas'); cv.width = cv.height = S;
   const ctx = cv.getContext('2d')!; ctx.drawImage(img, 0, 0, S, S);
   const src = ctx.getImageData(0, 0, S, S).data;
@@ -54,6 +54,22 @@ function colorMasks(img: HTMLImageElement): Record<LayerKey, HTMLCanvasElement> 
     c.getContext('2d')!.putImageData(out[k], 0, 0);
     return [k, c];
   })) as Record<LayerKey, HTMLCanvasElement>;
+}
+
+// flat wall colour per layer; textured sides show stripes where each slice's colours differ
+const SIDE_COLOR: Record<LayerKey, number> = { navy: 0x0b1530, red: 0x7a1c1c, orange: 0x8a3a06, white: 0x5c6270 };
+
+/** Grayscale alpha mask with blurred edges, so alphaTest cuts a smooth contour instead of pixel steps. */
+function softAlpha(mask: HTMLCanvasElement): HTMLCanvasElement {
+  const c = document.createElement('canvas'); c.width = mask.width; c.height = mask.height;
+  const ctx = c.getContext('2d')!;
+  const tmp = document.createElement('canvas'); tmp.width = c.width; tmp.height = c.height;
+  const tc = tmp.getContext('2d')!;
+  tc.filter = 'blur(2px)'; tc.drawImage(mask, 0, 0); tc.filter = 'none';
+  tc.globalCompositeOperation = 'source-in'; tc.fillStyle = '#fff'; tc.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.drawImage(tmp, 0, 0);
+  return c;
 }
 
 /** Mounts the logo into host and returns a teardown. onFail is called if the image or WebGL is unavailable. */
@@ -90,11 +106,13 @@ export function mountLogo3D(host: HTMLElement, src: string, onFail: () => void):
     LAYERS.forEach(L => {
       const t = new THREE.CanvasTexture(canvases[L.k]);
       t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+      const a = new THREE.CanvasTexture(softAlpha(canvases[L.k]));
+      a.anisotropy = 8;
       mats[L.k] = {
-        front: new THREE.MeshStandardMaterial({ map: t, alphaTest: 0.5, roughness: 0.45, metalness: 0.15, side: THREE.DoubleSide }),
-        side: new THREE.MeshStandardMaterial({ map: t, alphaTest: 0.5, roughness: 0.7, metalness: 0.1, color: 0x6b6f78, side: THREE.DoubleSide }),
+        front: new THREE.MeshStandardMaterial({ map: t, alphaMap: a, alphaTest: 0.5, roughness: 0.45, metalness: 0.15, side: THREE.DoubleSide }),
+        side: new THREE.MeshStandardMaterial({ alphaMap: a, alphaTest: 0.5, roughness: 0.7, metalness: 0.1, color: SIDE_COLOR[L.k], side: THREE.DoubleSide }),
       };
-      disposables.push(t, mats[L.k].front, mats[L.k].side);
+      disposables.push(t, a, mats[L.k].front, mats[L.k].side);
     });
 
     const W = 2, H = W / SLICES;
@@ -108,11 +126,15 @@ export function mountLogo3D(host: HTMLElement, src: string, onFail: () => void):
       g.position.y = W / 2 - H * (s + 0.5);
       const layerGroups = LAYERS.map(L => {
         const lg = new THREE.Group();
-        for (let c = 0; c < COPIES; c++) {
-          const m = new THREE.Mesh(geo, c === COPIES - 1 ? mats[L.k].front : mats[L.k].side);
-          m.position.z = L.z - L.d + (L.d * c) / (COPIES - 1);
-          lg.add(m);
+        const sides = new THREE.InstancedMesh(geo, mats[L.k].side, COPIES - 1);
+        const mtx = new THREE.Matrix4();
+        for (let c = 0; c < COPIES - 1; c++) {
+          sides.setMatrixAt(c, mtx.makeTranslation(0, 0, L.z - L.d + (L.d * c) / (COPIES - 1)));
         }
+        disposables.push(sides);
+        const front = new THREE.Mesh(geo, mats[L.k].front);
+        front.position.z = L.z;
+        lg.add(sides, front);
         g.add(lg);
         return { lg, L };
       });
